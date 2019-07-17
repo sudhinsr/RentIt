@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RentIt.Extensions;
 using RentIt.Models;
 
 namespace RentIt
@@ -35,6 +36,8 @@ namespace RentIt
 
             services.AddDbContext<RentItContext>(options =>
                     options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddDomainServices();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
