@@ -47,7 +47,7 @@ namespace RentIt.Controllers
         // GET: ProductItem/Create
         public IActionResult Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "ProductId");
+            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code");
             return View();
         }
 
@@ -56,7 +56,7 @@ namespace RentIt.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductItemId,ProductId,Remarks,Code,Amount,Status")] ProductItem productItem)
+        public async Task<IActionResult> Create([Bind("ProductId,Remarks,Code,Amount,Status")] ProductItem productItem)
         {
             if (ModelState.IsValid)
             {
@@ -64,7 +64,7 @@ namespace RentIt.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "ProductId", productItem.ProductId);
+            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code", productItem.ProductId);
             return View(productItem);
         }
 
@@ -81,7 +81,7 @@ namespace RentIt.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "ProductId", productItem.ProductId);
+            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code", productItem.ProductId);
             return View(productItem);
         }
 

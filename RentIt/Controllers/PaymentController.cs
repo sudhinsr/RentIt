@@ -56,10 +56,11 @@ namespace RentIt.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PaymentId,Amount,RentId,PhoneNo,CreatedDate")] Payment payment)
+        public async Task<IActionResult> Create([Bind("Amount,RentId,PhoneNo")] Payment payment)
         {
             if (ModelState.IsValid)
             {
+                payment.CreatedDate = DateTime.UtcNow;
                 _context.Add(payment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -90,7 +91,7 @@ namespace RentIt.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PaymentId,Amount,RentId,PhoneNo,CreatedDate")] Payment payment)
+        public async Task<IActionResult> Edit(int id, [Bind("PaymentId,Amount,RentId,PhoneNo")] Payment payment)
         {
             if (id != payment.PaymentId)
             {
@@ -101,6 +102,7 @@ namespace RentIt.Controllers
             {
                 try
                 {
+                    payment.CreatedDate = DateTime.UtcNow;
                     _context.Update(payment);
                     await _context.SaveChangesAsync();
                 }

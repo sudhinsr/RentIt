@@ -1,4 +1,5 @@
-﻿@model RentIt.Models.ProductItem
+﻿@using RentIt.Models.Enum
+@model RentIt.Models.ProductItem
 
 @{
     ViewData["Title"] = "Create";
@@ -33,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
+                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<ProductItemStatus>()"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">

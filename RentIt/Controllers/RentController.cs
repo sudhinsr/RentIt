@@ -47,7 +47,7 @@ namespace RentIt.Controllers
         // GET: Rent/Create
         public IActionResult Create()
         {
-            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "ProductItemId");
+            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "Code");
             return View();
         }
 
@@ -56,15 +56,16 @@ namespace RentIt.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RentId,ProductItemId,Amount,PhoneNo,AddressLine1,AddressLine2,Status,CreatedDate")] Rent rent)
+        public async Task<IActionResult> Create([Bind("ProductItemId,Amount,PhoneNo,AddressLine1,AddressLine2,Status")] Rent rent)
         {
             if (ModelState.IsValid)
             {
+                rent.CreatedDate = DateTime.UtcNow;
                 _context.Add(rent);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "ProductItemId", rent.ProductItemId);
+            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "Code", rent.ProductItemId);
             return View(rent);
         }
 
@@ -81,7 +82,7 @@ namespace RentIt.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "ProductItemId", rent.ProductItemId);
+            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "Code", rent.ProductItemId);
             return View(rent);
         }
 
@@ -101,6 +102,7 @@ namespace RentIt.Controllers
             {
                 try
                 {
+                    rent.CreatedDate = DateTime.UtcNow;
                     _context.Update(rent);
                     await _context.SaveChangesAsync();
                 }
@@ -117,7 +119,7 @@ namespace RentIt.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "ProductItemId", rent.ProductItemId);
+            ViewData["ProductItemId"] = new SelectList(_context.ProductItem, "ProductItemId", "Code", rent.ProductItemId);
             return View(rent);
         }
 
