@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RentIt.Models.Product>
+﻿@model IEnumerable<RentIt.ViewModels.ProductViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -24,6 +24,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AvilableProductCount)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -41,6 +44,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AvilableProductCount)/@Html.DisplayFor(modelItem => item.TotalProductCount)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |

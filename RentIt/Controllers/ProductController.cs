@@ -20,7 +20,7 @@ namespace RentIt.Controllers
         // GET: Product
         public async Task<IActionResult> Index()
         {
-            return View(await _productRepository.Query().ToArrayAsync());
+            return View(await _productRepository.GetProductsAsync());
         }
 
         // GET: Product/Details/5
