@@ -1,27 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RentIt.Models;
+using RentIt.Repository.Interface;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RentIt.Controllers
 {
     public class ProductItemController : Controller
     {
-        private readonly RentItContext _context;
+        private readonly IProductItemRepository _productItemRepository;
+        private readonly IProductRepository _productRepository;
 
-        public ProductItemController(RentItContext context)
+        public ProductItemController(IProductItemRepository productItemRepository,
+            IProductRepository productRepository)
         {
-            _context = context;
+            _productItemRepository = productItemRepository;
+            _productRepository = productRepository;
         }
 
         // GET: ProductItem
         public async Task<IActionResult> Index()
         {
-            var rentItContext = _context.ProductItem.Include(p => p.Product);
+            var rentItContext = _productItemRepository.Query().Include(p => p.Product);
             return View(await rentItContext.ToListAsync());
         }
 
@@ -33,7 +35,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var productItem = await _context.ProductItem
+            var productItem = await _productItemRepository.Query()
                 .Include(p => p.Product)
                 .FirstOrDefaultAsync(m => m.ProductItemId == id);
             if (productItem == null)
@@ -47,7 +49,7 @@ namespace RentIt.Controllers
         // GET: ProductItem/Create
         public IActionResult Create()
         {
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code");
+            ViewData["ProductId"] = new SelectList(_productItemRepository.Query(), "ProductId", "Code");
             return View();
         }
 
@@ -60,11 +62,10 @@ namespace RentIt.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(productItem);
-                await _context.SaveChangesAsync();
+                await _productItemRepository.InsertAsync(productItem);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code", productItem.ProductId);
+            ViewData["ProductId"] = new SelectList(_productRepository.Query(), "ProductId", "Code", productItem.ProductId);
             return View(productItem);
         }
 
@@ -76,12 +77,12 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var productItem = await _context.ProductItem.FindAsync(id);
+            var productItem = await _productItemRepository.GetAsync(id.Value);
             if (productItem == null)
             {
                 return NotFound();
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Code", productItem.ProductId);
+            ViewData["ProductId"] = new SelectList(_productItemRepository.Query(), "ProductId", "Code", productItem.ProductId);
             return View(productItem);
         }
 
@@ -101,8 +102,7 @@ namespace RentIt.Controllers
             {
                 try
                 {
-                    _context.Update(productItem);
-                    await _context.SaveChangesAsync();
+                    await _productItemRepository.UpdateAsync(productItem);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,7 +117,7 @@ namespace RentIt.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "ProductId", productItem.ProductId);
+            ViewData["ProductId"] = new SelectList(_productItemRepository.Query(), "ProductId", "ProductId", productItem.ProductId);
             return View(productItem);
         }
 
@@ -129,7 +129,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var productItem = await _context.ProductItem
+            var productItem = await _productItemRepository.Query()
                 .Include(p => p.Product)
                 .FirstOrDefaultAsync(m => m.ProductItemId == id);
             if (productItem == null)
@@ -145,15 +145,13 @@ namespace RentIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var productItem = await _context.ProductItem.FindAsync(id);
-            _context.ProductItem.Remove(productItem);
-            await _context.SaveChangesAsync();
+            await _productItemRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductItemExists(int id)
         {
-            return _context.ProductItem.Any(e => e.ProductItemId == id);
+            return _productItemRepository.Query().Any(e => e.ProductItemId == id);
         }
     }
 }

@@ -1,27 +1,26 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RentIt.Models;
+using RentIt.Repository.Interface;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using RentIt.Models;
 
 namespace RentIt.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly RentItContext _context;
+        private readonly IProductRepository _productRepository;
 
-        public ProductController(RentItContext context)
+        public ProductController(IProductRepository productRepository)
         {
-            _context = context;
+            _productRepository = productRepository;
         }
 
         // GET: Product
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Product.ToListAsync());
+            return View(await _productRepository.Query().ToArrayAsync());
         }
 
         // GET: Product/Details/5
@@ -32,8 +31,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _productRepository.GetAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -57,8 +55,7 @@ namespace RentIt.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                await _productRepository.InsertAsync(product);
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -72,7 +69,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await _productRepository.GetAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -96,8 +93,7 @@ namespace RentIt.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await _productRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,8 +119,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _productRepository.GetAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -138,15 +133,13 @@ namespace RentIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            await _context.SaveChangesAsync();
+            await _productRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Product.Any(e => e.ProductId == id);
+            return _productRepository.Query().Any(e => e.ProductId == id);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace RentIt.Repository
     {
         protected RentItContext _dbContext { get; set; }
 
-        public async Task<T> GetAsync(string id)
+        public async Task<T> GetAsync(int id)
         {
             return await _dbContext.FindAsync<T>(id);
         }
@@ -30,6 +30,12 @@ namespace RentIt.Repository
         public async Task UpdateAsync(T entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            _dbContext.Remove(_dbContext.Find<T>(id));
             await _dbContext.SaveChangesAsync();
         }
     }

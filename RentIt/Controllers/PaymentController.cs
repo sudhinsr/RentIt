@@ -6,22 +6,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RentIt.Models;
+using RentIt.Repository.Interface;
 
 namespace RentIt.Controllers
 {
     public class PaymentController : Controller
     {
-        private readonly RentItContext _context;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IRentRepository _rentRepository;
 
-        public PaymentController(RentItContext context)
+        public PaymentController(IPaymentRepository paymentRepository, IRentRepository rentRepository)
         {
-            _context = context;
+            _paymentRepository = paymentRepository;
+            _rentRepository = rentRepository;
         }
 
         // GET: Payment
         public async Task<IActionResult> Index()
         {
-            var rentItContext = _context.Payment.Include(p => p.Rent);
+            var rentItContext = _paymentRepository.Query().Include(p => p.Rent);
             return View(await rentItContext.ToListAsync());
         }
 
@@ -33,7 +36,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var payment = await _context.Payment
+            var payment = await _paymentRepository.Query()
                 .Include(p => p.Rent)
                 .FirstOrDefaultAsync(m => m.PaymentId == id);
             if (payment == null)
@@ -47,7 +50,7 @@ namespace RentIt.Controllers
         // GET: Payment/Create
         public IActionResult Create()
         {
-            ViewData["RentId"] = new SelectList(_context.Rent, "RentId", "RentId");
+            ViewData["RentId"] = new SelectList(_rentRepository.Query(), "RentId", "RentId");
             return View();
         }
 
@@ -61,11 +64,10 @@ namespace RentIt.Controllers
             if (ModelState.IsValid)
             {
                 payment.CreatedDate = DateTime.UtcNow;
-                _context.Add(payment);
-                await _context.SaveChangesAsync();
+                await _paymentRepository.InsertAsync(payment);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentId"] = new SelectList(_context.Rent, "RentId", "RentId", payment.RentId);
+            ViewData["RentId"] = new SelectList(_rentRepository.Query(), "RentId", "RentId", payment.RentId);
             return View(payment);
         }
 
@@ -77,12 +79,12 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var payment = await _context.Payment.FindAsync(id);
+            var payment = await _paymentRepository.GetAsync(id.Value);
             if (payment == null)
             {
                 return NotFound();
             }
-            ViewData["RentId"] = new SelectList(_context.Rent, "RentId", "RentId", payment.RentId);
+            ViewData["RentId"] = new SelectList(_rentRepository.Query(), "RentId", "RentId", payment.RentId);
             return View(payment);
         }
 
@@ -103,8 +105,7 @@ namespace RentIt.Controllers
                 try
                 {
                     payment.CreatedDate = DateTime.UtcNow;
-                    _context.Update(payment);
-                    await _context.SaveChangesAsync();
+                    await _paymentRepository.UpdateAsync(payment);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -119,7 +120,7 @@ namespace RentIt.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentId"] = new SelectList(_context.Rent, "RentId", "RentId", payment.RentId);
+            ViewData["RentId"] = new SelectList(_rentRepository.Query(), "RentId", "RentId", payment.RentId);
             return View(payment);
         }
 
@@ -131,7 +132,7 @@ namespace RentIt.Controllers
                 return NotFound();
             }
 
-            var payment = await _context.Payment
+            var payment = await _paymentRepository.Query()
                 .Include(p => p.Rent)
                 .FirstOrDefaultAsync(m => m.PaymentId == id);
             if (payment == null)
@@ -147,15 +148,13 @@ namespace RentIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var payment = await _context.Payment.FindAsync(id);
-            _context.Payment.Remove(payment);
-            await _context.SaveChangesAsync();
+            await _paymentRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool PaymentExists(int id)
         {
-            return _context.Payment.Any(e => e.PaymentId == id);
+            return _paymentRepository.Query().Any(e => e.PaymentId == id);
         }
     }
 }
