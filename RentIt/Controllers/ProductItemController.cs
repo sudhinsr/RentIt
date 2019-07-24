@@ -21,10 +21,10 @@ namespace RentIt.Controllers
         }
 
         // GET: ProductItem
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int productId)
         {
-            var rentItContext = _productItemRepository.Query().Include(p => p.Product);
-            return View(await rentItContext.ToListAsync());
+            var productItems = await _productItemRepository.GetProductItemsAsync(productId);
+            return View(productItems);
         }
 
         // GET: ProductItem/Details/5
