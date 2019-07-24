@@ -25,7 +25,7 @@ namespace RentIt.Repository
                 Code = _.Code,
                 Name = _.Name,
                 Amount = _.Amount,
-                AvilableProductCount = _.ProductItem.Count(c => c.Status == ProductItemStatus.Available),
+                AvailableProductCount = _.ProductItem.Count(c => c.Status == ProductItemStatus.Available),
                 TotalProductCount = _.ProductItem.Count(),
             }).ToArrayAsync();
         }

@@ -25,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AvilableProductCount)
+                @Html.DisplayNameFor(model => model.AvailableProductCount)
             </th>
             <th></th>
         </tr>
@@ -46,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AvilableProductCount)/@Html.DisplayFor(modelItem => item.TotalProductCount)
+                @Html.DisplayFor(modelItem => item.AvailableProductCount)/@Html.DisplayFor(modelItem => item.TotalProductCount)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
