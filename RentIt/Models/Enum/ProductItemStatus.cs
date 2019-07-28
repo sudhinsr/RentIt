@@ -2,6 +2,7 @@
 {
     public enum ProductItemStatus
     {
-        Available
+        Available,
+        Unavailable
     }
 }

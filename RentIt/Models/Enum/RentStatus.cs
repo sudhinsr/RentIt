@@ -2,6 +2,7 @@
 {
     public enum RentStatus
     {
-        Rented
+        Rented,
+        Closed
     }
 }

@@ -61,6 +61,7 @@
                 @Html.DisplayFor(modelItem => item.ProductItem.Code)
             </td>
             <td>
+                <a asp-controller="Payment" asp-action="Index" asp-route-rentId="@item.RentId">Payments</a> |
                 <a asp-action="Edit" asp-route-id="@item.RentId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.RentId">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.RentId">Delete</a>

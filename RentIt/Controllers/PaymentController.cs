@@ -22,9 +22,11 @@ namespace RentIt.Controllers
         }
 
         // GET: Payment
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int rentId)
         {
-            var rentItContext = _paymentRepository.Query().Include(p => p.Rent);
+            var rentItContext = _paymentRepository.Query()
+                .Where(_ => _.RentId == rentId)
+                .Include(p => p.Rent);
             return View(await rentItContext.ToListAsync());
         }
 
